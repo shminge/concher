@@ -133,6 +133,13 @@ def handle_list(args):
 
 
 def handle_register(args):
+    print(args)
+    if len(args) > 3:
+        # We need to check if the things are quoted
+        if (args[2][0]=='"' and args[-1][-1]=='"') or (args[2][0]=="'" and args[-1][-1]=="'"):
+            args = args[:2] + [' '.join(args[2:])]
+            print(args)
+            
     if len(args) < 2:
         print(f"{red(bold('Error:'))} register requires at least two arguments: "
               f"{bold('app|site|context')} and {bold('name')} (plus {bold('location')} for app/site).")
@@ -141,13 +148,25 @@ def handle_register(args):
     kind, name = args[0], args[1]
 
     match kind:
-        case 'app' | 'site':
+        case 'app':
             if len(args) != 3:
-                print(f"{red(bold('Error:'))} register {kind} requires a {bold('name')} and a {bold('location')}.")
+                print(f"{red(bold('Error:'))} register app requires a {bold('name')} and a {bold('location')}.")
                 return True, False
-            locations[name] = {'type': kind, 'loc': args[2]}
-            print(f"Registered {bold(kind)} {bold(name)} at {args[2]}")
+            locations[name] = {'type': 'app', 'loc': args[2]}
+            print(f"Registered {bold('app')} {bold(name)} at {args[2]}")
             return True, True
+
+        case 'site':
+            if len(args) != 3:
+                print(f"{red(bold('Error:'))} register site requires a {bold('name')} and a {bold('URL')}.")
+                return True, False
+            url = args[2]
+            if not re.match(r'^https?://', url):
+                url = 'https://' + url
+            locations[name] = {'type': 'site', 'loc': url}
+            print(f"Registered {bold('site')} {bold(name)} at {url}")
+            return True, True
+
 
         case 'context':
             if len(args) != 2:
