@@ -133,12 +133,15 @@ def handle_list(args):
 
 
 def handle_register(args):
-    print(args)
     if len(args) > 3:
-        # We need to check if the things are quoted
-        if (args[2][0]=='"' and args[-1][-1]=='"') or (args[2][0]=="'" and args[-1][-1]=="'"):
-            args = args[:2] + [' '.join(args[2:])]
-            print(args)
+        # Check if the third element starts with a quote and the last ends with the same quote
+        if (args[2][0] == '"' and args[-1][-1] == '"') or (args[2][0] == "'" and args[-1][-1] == "'"):
+            quote_char = args[2][0]
+            merged = ' '.join(args[2:])
+            if merged[0] == quote_char and merged[-1] == quote_char:
+                merged = merged[1:-1]
+            args = args[:2] + [merged]
+
             
     if len(args) < 2:
         print(f"{red(bold('Error:'))} register requires at least two arguments: "
@@ -267,6 +270,8 @@ contexts = load_pkl("contexts.pkl", {})
 
 print(f"Type {bold('help')} to learn more...")
 running = True
+
+handle_open(["startup"])
 
 
 while running:
